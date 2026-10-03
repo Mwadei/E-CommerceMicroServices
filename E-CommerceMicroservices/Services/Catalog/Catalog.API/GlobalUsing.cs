@@ -3,3 +3,4 @@ global using MediatR;
 global using Carter;
 global using BuildingBlocks.CQRS;
 global using Marten;
+global using Catalog.API.Models;
