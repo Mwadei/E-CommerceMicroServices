@@ -16,6 +16,13 @@
     {
         public async Task<DeleteProductResult> Handle(DeleteProductcommand command, CancellationToken cancellationToken)
         {
+            var product = await session.LoadAsync<Product>(command.id, cancellationToken);
+
+            if (product is null)
+            {
+                throw new ProductNotFoundException(command.id);
+            }
+
             session.Delete<Product>(command.id);
             await session.SaveChangesAsync();
 

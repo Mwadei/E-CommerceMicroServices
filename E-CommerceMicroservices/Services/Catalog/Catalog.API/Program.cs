@@ -1,5 +1,3 @@
-using BuildingBlocks.Behaviors;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,6 +18,8 @@ options.Connection(builder.Configuration.GetConnectionString("Database"));
 
 builder.Services.AddValidatorsFromAssembly(assembly);
 
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
 builder.Services.AddCarter();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -34,5 +34,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapCarter();
+
+app.UseExceptionHandler(options => { });
 
 app.Run();
