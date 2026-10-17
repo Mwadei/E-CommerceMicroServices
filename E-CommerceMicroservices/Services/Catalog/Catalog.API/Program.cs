@@ -1,8 +1,11 @@
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
 var builder = WebApplication.CreateBuilder(args);
+var assembly = typeof(Program).Assembly;
+var databaseConnetionString = builder.Configuration.GetConnectionString("Database")!;
 
 // Add services to the container.
-
-var assembly = typeof(Program).Assembly;
 
 builder.Services.AddMediatR(config =>
 {
@@ -13,7 +16,7 @@ builder.Services.AddMediatR(config =>
 
 builder.Services.AddMarten(options =>
 {
-options.Connection(builder.Configuration.GetConnectionString("Database")!);
+options.Connection(databaseConnetionString);
 
 }).UseLightweightSessions();
 
@@ -30,6 +33,8 @@ builder.Services.AddCarter();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddHealthChecks().AddNpgSql(databaseConnetionString);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -41,5 +46,11 @@ if (app.Environment.IsDevelopment())
 app.MapCarter();
 
 app.UseExceptionHandler(options => { });
+
+app.UseHealthChecks("/health", 
+    new HealthCheckOptions
+    {
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    });
 
 app.Run();
