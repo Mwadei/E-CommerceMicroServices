@@ -8,14 +8,19 @@ builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(assembly);
     config.AddOpenBehavior(typeof(ValidatorBehaviors<,>));
+    config.AddOpenBehavior(typeof(LoggingBehavior<,>));
 });
 
 builder.Services.AddMarten(options =>
 {
-options.Connection(builder.Configuration.GetConnectionString("Database"));
+options.Connection(builder.Configuration.GetConnectionString("Database")!);
 
 }).UseLightweightSessions();
 
+if(builder.Environment.IsDevelopment())
+{
+    builder.Services.InitializeMartenWith<GatalogInitialData>();
+}
 builder.Services.AddValidatorsFromAssembly(assembly);
 
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
